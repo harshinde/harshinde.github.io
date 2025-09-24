@@ -1,1 +1,93 @@
 hello world
+
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Rive Hello World</title>
+  </head>
+  <body>
+    <canvas id="canvas" width="500" height="500"></canvas>
+
+    <script src="https://unpkg.com/@rive-app/canvas"></script>
+    <script type="module">
+      // ES6 module approach with modern JavaScript features
+      class RiveAnimation {
+        constructor() {
+          this.canvas = document.getElementById("canvas");
+          this.animation = null;
+          this.init();
+        }
+
+        init() {
+          // Wait for Rive to be available
+          if (typeof rive === 'undefined') {
+            console.error('Rive library not loaded');
+            return;
+          }
+
+          this.createAnimation();
+        }
+
+        createAnimation() {
+          const config = {
+            src: "https://cdn.rive.app/animations/vehicles.riv",
+            canvas: this.canvas,
+            autoplay: true,
+            // artboard: "Arboard", // Optional. If not supplied the default is selected
+            stateMachines: "bumpy",
+            onLoad: this.handleLoad.bind(this),
+            onLoadError: this.handleError.bind(this)
+          };
+
+          this.animation = new rive.Rive(config);
+        }
+
+        handleLoad = () => {
+          console.log('Rive animation loaded successfully');
+          // Ensure the drawing surface matches the canvas size and device pixel ratio
+          this.animation.resizeDrawingSurfaceToCanvas();
+        };
+
+        handleError = (error) => {
+          console.error('Failed to load Rive animation:', error);
+        };
+
+        // Public methods for controlling the animation
+        play() {
+          this.animation?.play();
+        }
+
+        pause() {
+          this.animation?.pause();
+        }
+
+        stop() {
+          this.animation?.stop();
+        }
+      }
+
+      // Initialize the animation when DOM is loaded
+      document.addEventListener('DOMContentLoaded', () => {
+        const riveApp = new RiveAnimation();
+        
+        // Optional: Add some basic controls
+        const controls = document.createElement('div');
+        controls.innerHTML = `
+          <button id="playBtn">Play</button>
+          <button id="pauseBtn">Pause</button>
+          <button id="stopBtn">Stop</button>
+        `;
+        controls.style.cssText = 'margin-top: 10px; text-align: center;';
+        document.body.appendChild(controls);
+
+        // Add event listeners with ES6 arrow functions
+        document.getElementById('playBtn').addEventListener('click', () => riveApp.play());
+        document.getElementById('pauseBtn').addEventListener('click', () => riveApp.pause());
+        document.getElementById('stopBtn').addEventListener('click', () => riveApp.stop());
+      });
+    </script>
+  </body>
+</html>
